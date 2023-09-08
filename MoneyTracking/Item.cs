@@ -28,7 +28,7 @@ namespace MoneyTracking
 
         public string ToString()
         {
-            return Title.PadRight(paddingSize) + Date.ToString("yyy-MM-dd").PadRight(paddingSize) + (Type == TYPE.EXPENSE ? "-" : "") + Amount.ToString().PadRight(paddingSize);
+            return Type.ToString().PadRight(paddingSize) + Title.PadRight(paddingSize) + Date.ToString("yyy-MM-dd").PadRight(paddingSize) + (Type == TYPE.EXPENSE ? "-" : "") + Amount.ToString().PadRight(paddingSize);
         }
 
     }

@@ -9,11 +9,14 @@ using System.Threading.Tasks;
 
 namespace MoneyTracking
 {
+    /*
+     * Console interface for the program
+     */
     internal class UserInterface
     {
         static int paddingSize = 25;
         String printoutDivider = "-----------------------------------------------------------------------------------------------------------------------";
-        String printoutHeader = "#".PadRight(paddingSize) + "Title".PadRight(paddingSize) + "Month".PadRight(paddingSize) + "Amount".PadRight(paddingSize);
+        String printoutHeader = "#".PadRight(paddingSize) + "Type".PadRight(paddingSize) + "Title".PadRight(paddingSize) + "Month".PadRight(paddingSize) + "Amount".PadRight(paddingSize);
         private Account account = new Account();
         public UserInterface() { }
         private String[] menuOptions = {
@@ -22,15 +25,23 @@ namespace MoneyTracking
             "Edit Item",
             "Save and Exit"
         };
+        private String[] columnNames =
+        {
+            "Type",
+            "Title",
+            "Date",
+            "Amount"
+        };
 
 
         /*
-         * Main menu logic for user to make action regarding the account
+         * Main menu logic for user to make action regarding the account. This main loop
+         * is going to cointinue until user does not exit the program. Data is load and saved automatically.
          */
         public void mainLoop()
         {
-            Boolean exit = false;
 
+            Boolean exit = false;
             account.loadAccount();
             printMsg("Welcome to TrackMoney");
             while (!exit)
@@ -68,7 +79,7 @@ namespace MoneyTracking
         }
 
         /*
-         * Dislays Items. All, Expenses or Income 
+         * Dislays Items. All, Expenses or Income. Data can be ordered by column descending or ascending.
          */
         private void showItems()
         {
@@ -76,29 +87,37 @@ namespace MoneyTracking
 
             while (!exit)
             {
-                printMsg("Show (a)ll, (e)xpense, (i)ncome, (x)exit");
-                String userInput = Console.ReadLine().Trim().ToLower();
 
-                switch (userInput)
+                printMsg("Show (a)ll, (e)xpense, (i)ncome, (x)exit");
+                String whatShow = Console.ReadLine().Trim().ToLower();
+                if (whatShow == "x") { exit = true; continue; }
+                printMsg("Order by col nbr 0,1,2,3 (# not included)");
+                int order = 0;
+                if(int.TryParse(Console.ReadLine().Trim(), out int col)) { order = col; };
+                printMsg("Descending (y)es, (n)o, (x)exit");
+                bool descending = Console.ReadLine().Trim().ToLower() == "y" ? true : false;
+
+                switch (whatShow)
                 {
                     case "a":
-                        printList(account.getItems());
+                        printList(account.getItems(), order, descending);
                         break;
                     case "e":
-                        printList(account.getExpenses());
+                        printList(account.getExpenses(), order, descending);
                         break;
                     case "i":
-                        printList(account.getIncomes());
+                        printList(account.getIncomes(), order, descending);
                         break;
                     case "x":
                         exit = true;
                         break;
                 }
+                printMsg("You have currently (" + account.getBalance() + ") kr on your account\n");
             }
         }
 
         /*
-         * Adds item to the account. It can be Exopense or an income
+         * Adds item to the account. It can be Expense or an Income
          */
         private void addItem()
         {
@@ -178,6 +197,10 @@ namespace MoneyTracking
             }
         }
 
+        /*
+         * changes values of existing data. 
+         * 
+         */
         private void editItem()
         {
             Boolean exitAddItem = false;
@@ -302,7 +325,7 @@ namespace MoneyTracking
                         }
 
 
-                    }
+                    }//remove item
                     else if (userInput == "r")
                     {
                         account.removeItemByIndex(outIndex);
@@ -316,19 +339,65 @@ namespace MoneyTracking
             }
         }
 
-        private void removeItem(Item item)
-        {
-            account.removeItem(item);
-        }
-        private void updateItem() { }
-        private void saveAccount() { }
-        private void loadAccount() { }
-
         /*
-         * Show the account details to the user
+         * Show the account details to the user. Default Descending, and column 0
          */
-        private void printList(List<Item> list)
-        {
+        private void printList(List<Item> list, int sortColumn = 0, bool desc = true)
+        {   
+            
+            if (desc)
+            {
+                switch (sortColumn)
+                {
+                    case 0:
+                        {
+                            list = list.OrderByDescending(item => item.Type).ToList();
+                            break;
+                        }
+                    case 1:
+                        {
+                            list = list.OrderByDescending(item => item.Title).ToList();
+                            break;
+                        }
+                    case 2:
+                        {
+                            list = list.OrderByDescending(item => item.Date).ToList();
+                            break;
+                        }
+                    case 3:
+                        {
+                            list = list.OrderByDescending(item => item.Amount).ToList();
+                            break;
+                        }
+                }
+            }
+            else 
+            {
+                switch (sortColumn)
+                {
+                    case 0:
+                        {
+                            list = list.OrderBy(item => item.Type).ToList();
+                            break;
+                        }
+                    case 1:
+                        {
+                            list = list.OrderBy(item => item.Title).ToList();
+                            break;
+                        }
+                    case 2:
+                        {
+                            list = list.OrderBy(item => item.Date).ToList();
+                            break;
+                        }
+                    case 3:
+                        {
+                            list = list.OrderBy(item => item.Amount).ToList();
+                            break;
+                        }
+                }
+            }
+
             printMsg(printoutDivider);
             printMsg(printoutHeader);
             printMsg(printoutDivider);
