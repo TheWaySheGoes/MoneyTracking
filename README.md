@@ -11,5 +11,5 @@ Program composed of 3 main classes.
 
 Program start in the Program Class
 
-## Feature work
-Code can and should be optimised in the feture. Especialy in the UserInterface Class. 
+## Future work
+Code can and should be optimised in the future. Especialy in the UserInterface Class. 
